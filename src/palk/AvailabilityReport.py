@@ -1,5 +1,7 @@
 from utils import TIME_FORMAT_TIME, File, Time
+
 from palk._common import log
+
 
 class AvailabilityReport:
     def __init__(self, appointment_timeslots: list):
@@ -18,7 +20,9 @@ class AvailabilityReport:
     def timeslot_lines(self):
 
         idx = {}
-        for timeslot in sorted(self.appointment_timeslots, key=lambda x: x.ut):
+        for timeslot in sorted(
+            self.appointment_timeslots, key=lambda x: x.ut
+        ):
             if not timeslot.is_available:
                 continue
             application_type = timeslot.appointment_type
@@ -48,6 +52,6 @@ class AvailabilityReport:
 
         lines = self.header_lines + self.timeslot_lines
         content = '\n'.join(lines)
-        md_file_name = '/tmp/README.md'        
+        md_file_name = '/tmp/README.md'
         File(md_file_name).write(content)
         log.info(f'Wrote report to "{md_file_name}".')

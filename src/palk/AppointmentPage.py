@@ -194,7 +194,6 @@ class AppointmentPage:
             except Exception as e:
                 log.warning(e)
                 return []
-            
 
         all_appointment_timeslots_list = mr.map_parallel(
             lambda page: inner(page=page),
