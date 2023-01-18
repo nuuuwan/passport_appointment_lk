@@ -15,7 +15,7 @@ class AvailabilityReport:
         ).stringify(Time())
         return [
             '# Passport Application Reservation System - Availability Report',
-            f'*(As of {time_str})*',
+            f'*As of {time_str}*',
         ]
 
     @property
@@ -53,7 +53,8 @@ class AvailabilityReport:
                 for date_str in idx[application_type][location]:
                     timeslots = idx[application_type][location][date_str]
                     n_appointments = len(timeslots)
-                    lines.append(f'* {date_str} ({n_appointments})')
+                    label = 'timeslot' if n_appointments == 1 else 'timeslots'
+                    lines.append(f'* {date_str} ({n_appointments} {label})')
 
         return lines
 
