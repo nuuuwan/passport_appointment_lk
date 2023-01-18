@@ -3,7 +3,7 @@ import time
 
 from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.common.by import By
-from utils import TIME_FORMAT_TIME, Time, TimeFormat
+from utils import SECONDS_IN, Time, TimeDelta, TimeFormat
 from utils.Browser import Browser
 
 from palk._common import log
@@ -16,46 +16,45 @@ URL_BASE = os.path.join(
 WINDOW_WIDTH = 840
 WINDOW_HEIGHT = WINDOW_WIDTH * 3
 TIME_FORMAT = TimeFormat('%Y %B %d %I.%M %p')
+N_DAYS = 60
+HOUR_STRS = ['8 AM', '9 AM', '10 AM', '11 AM', '12 PM', '2 PM']
 
 
 class AppointmentPage:
     @staticmethod
+    def sleep():
+        T_SLEEP = 1
+        time.sleep(T_SLEEP)
+
+    @staticmethod
     def get_driver():
         browser = Browser()
         browser.browser.set_window_size(WINDOW_WIDTH, WINDOW_HEIGHT)
-        browser.open(URL_BASE)
         return browser.browser
 
-    @staticmethod
-    def sleep():
-        T_SLEEP = 2
-        log.debug(f'😴 Sleeping for {T_SLEEP}s')
-        time.sleep(T_SLEEP)
-
     def __init__(
-        self, appointment_type: str, location: str, timeslot_time: Time
+        self,
+        appointment_type: str,
+        location: str,
+        time_timeslot: Time,
+        driver,
     ):
-        self.application_type = appointment_type
+        self.appointment_type = appointment_type
         self.location = location
-        self.timeslot_time = timeslot_time
-
-        self.driver = None
+        self.time_timeslot = time_timeslot
+        self.driver = driver
 
     @property
     def year_str(self):
-        return TimeFormat('%Y').stringify(self.timeslot_time)
+        return TimeFormat('%Y').stringify(self.time_timeslot)
 
     @property
     def month_str(self):
-        return TimeFormat('%B').stringify(self.timeslot_time)
+        return TimeFormat('%B').stringify(self.time_timeslot)
 
     @property
     def day_str(self):
-        return TimeFormat('%d').stringify(self.timeslot_time)
-
-    @property
-    def hour_str(self):
-        return TimeFormat('%-I %p').stringify(self.timeslot_time)
+        return TimeFormat('%d').stringify(self.time_timeslot)
 
     def find_element(self, by, value):
         return self.driver.find_element(by, value)
@@ -63,10 +62,10 @@ class AppointmentPage:
     def find_elements(self, by, value):
         return self.driver.find_elements(by, value)
 
-    def select_application_type(self):
-        log.debug(f'select_application_type: {self.application_type}')
+    def select_appointment_type(self):
+        log.debug(f'select_appointment_type: {self.appointment_type}')
         self.find_element(
-            By.XPATH, f'//label[text()="{self.application_type}"]'
+            By.XPATH, f'//label[text()="{self.appointment_type}"]'
         ).click()
         AppointmentPage.sleep()
 
@@ -107,25 +106,20 @@ class AppointmentPage:
         except NoSuchElementException:
             raise Exception('No Data for Day: ' + self.day_str)
 
-    def select_hour(self):
-        log.debug(f'select_hour: {self.hour_str}')
+    def select_hour(self, hour_str : str):
+        log.debug(f'select_hour: {hour_str}')
         try:
             span = self.find_element(
-                By.XPATH, f'//span[text()="{self.hour_str}"]'
+                By.XPATH, f'//span[text()="{hour_str}"]'
             )
             span.click()
             self.sleep()
         except NoSuchElementException:
-            raise Exception('No Data for Hour: ' + self.hour_str)
+            raise Exception('No Data for Hour: ' + hour_str)
 
-    def get_available_timeslots(self) -> list:
-        self.driver = AppointmentPage.get_driver()
-        self.select_application_type()
-        self.select_location()
-        self.goto_month_page()
-        self.select_day()
-        self.select_hour()
-
+    def parse_qtr_hours(
+        self,
+    ) -> list:
         N_BUTTONS_QTR_HOUR = 4
         appointment_timeslots = []
         for i_button_qtr_hour in range(N_BUTTONS_QTR_HOUR):
@@ -142,20 +136,72 @@ class AppointmentPage:
             t = TIME_FORMAT.parse(time_str_raw)
 
             appointment_timeslot = AppointmentTimeSlot(
-                appointment_type=self.application_type,
+                appointment_type=self.appointment_type,
                 location=self.location,
                 ut=t.ut,
                 is_available=is_available,
             )
             log.debug(appointment_timeslot.to_dict)
             appointment_timeslots.append(appointment_timeslot)
-        self.driver.close()
-        self.driver.quit()
+
         return appointment_timeslots
 
+    def get_timeslots(self):
+        self.driver.get(URL_BASE)
+        self.select_appointment_type()
+        self.select_location()
+
+        all_appointment_timeslots = []
+        try:
+            self.goto_month_page()
+            self.select_day()
+            for hour_str in HOUR_STRS:
+                self.select_hour(hour_str)
+                all_appointment_timeslots += self.parse_qtr_hours()
+        except Exception as e:
+            log.warning(e)
+        
+        return all_appointment_timeslots
+
+    @staticmethod
+    def get_all_timeslots() -> list:
+        time_now = Time()
+        driver = AppointmentPage.get_driver()
+        all_appointment_timeslots = []
+        for appointment_type in ['One Day Service']:
+            for location in ['HEAD OFFICE - BATTARAMULLA']:
+                for i_day in range(N_DAYS):
+                    time_timeslot = time_now + TimeDelta(
+                        i_day * SECONDS_IN.DAY
+                    )
+                    page = AppointmentPage(
+                        appointment_type=appointment_type,
+                        location=location,
+                        time_timeslot=time_timeslot,
+                        driver=driver,
+                    )
+                    all_appointment_timeslots += page.get_timeslots()
+        driver.close()
+        driver.quit()
+
+def test_appointment_page():
+    time_timeslot = Time() + TimeDelta(
+        1 * SECONDS_IN.DAY
+    )
+    driver = AppointmentPage.get_driver()
+    page = AppointmentPage(
+        appointment_type="One Day Service",
+        location="HEAD OFFICE - BATTARAMULLA",
+        time_timeslot=time_timeslot,
+        driver=driver,
+    )
+    print(page.get_timeslots())
+    driver.quit()
+
+def test_static():
+    print(AppointmentPage.get_all_timeslots())
 
 if __name__ == '__main__':
-    t = TIME_FORMAT_TIME.parse('2022-01-19 8:00:00 +0530')
-    page = AppointmentPage('One Day Service', 'HEAD OFFICE - BATTARAMULLA', t)
-    for application_timeslot in page.get_available_timeslots():
-        print(application_timeslot)
+    # test_appointment_page()
+    test_static()
+    
