@@ -2,12 +2,11 @@ import os
 import time
 
 from selenium.webdriver.common.by import By
-from utils import JSONFile, Log, Time, TimeFormat
+from utils import Time, TimeFormat
 from utils.Browser import Browser
 
+from palk._common import log
 from palk.AppointmentTimeSlot import AppointmentTimeSlot
-
-log = Log('passport-appointment-lk')
 
 URL_BASE = os.path.join(
     'https://eservices.immigration.gov.lk:8443',
@@ -65,9 +64,9 @@ class AppointmentPage:
                 return
         raise Exception(f'Preferred location {location} not found')
 
-    def get_available_sessions(self):
+    def get_available_timeslots(self):
         assert self.application_type and self.location
-        data_list = []
+        appointment_timeslots = []
 
         while True:
             elem_month = self.driver.find_element(
@@ -123,8 +122,7 @@ class AppointmentPage:
                             ut=time.ut,
                             is_available=is_available,
                         )
-                        print(appointment_timeslot.to_dict)
-                        data_list.append(appointment_timeslot.to_dict)
+                        appointment_timeslots.append(appointment_timeslot)
                     break
                 break
 
@@ -135,12 +133,4 @@ class AppointmentPage:
                 break
             elem_next.click()
             self.sleep()
-        return data_list
-
-
-if __name__ == '__main__':
-    page = AppointmentPage()
-    page.set_application_type('One Day Service')
-    page.set_location('HEAD OFFICE - BATTARAMULLA')
-    data_list = page.get_available_sessions()
-    JSONFile('data.json').write(data_list)
+        return appointment_timeslots
