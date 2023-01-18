@@ -11,7 +11,7 @@ class AvailabilityReport:
     def header_lines(self):
         time_str = TIME_FORMAT_TIME.stringify(Time())
         return [
-            '# Passport Application Reservation',
+            '# Passport Application Reservation - Availability Report',
             f'(Compiled at {time_str})',
             '',
         ]
