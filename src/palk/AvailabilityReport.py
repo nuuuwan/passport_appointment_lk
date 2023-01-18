@@ -16,6 +16,13 @@ class AvailabilityReport:
         return [
             '# Passport Application Reservation System - Availability Report',
             f'*Compiled at {time_str}*',
+            '---',
+        ]
+
+    @property
+    def footer_lines(self):
+        return [
+            '---',
             'Data Source:'
             + f' [Passport Application Reservation System]({URL_BASE})',
         ]
@@ -53,9 +60,12 @@ class AvailabilityReport:
         return lines
 
     def save(self):
-
-        lines = self.header_lines + self.timeslot_lines
+        lines = self.header_lines + self.timeslot_lines + self.footer_lines
         content = '\n'.join(lines)
         md_file_name = '/tmp/README.md'
         File(md_file_name).write(content)
         log.info(f'Wrote report to "{md_file_name}".')
+
+
+if __name__ == '__main__':
+    AvailabilityReport([]).save()
