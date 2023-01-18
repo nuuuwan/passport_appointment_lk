@@ -20,7 +20,9 @@ N_DAYS = 90
 HOUR_STRS = ['8 AM', '9 AM', '10 AM', '11 AM', '12 PM', '2 PM']
 MAX_THREADS = 4
 APPOINTMENT_TYPES = ['Normal Service', 'One Day Service']
-LOCATIONS = ['HEAD OFFICE - BATTARAMULLA']
+LOCATIONS = [
+    'HEAD OFFICE - BATTARAMULLA',
+]
 
 
 class AppointmentPage:
