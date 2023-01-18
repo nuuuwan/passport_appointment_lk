@@ -1,6 +1,7 @@
-from utils import TIME_FORMAT_TIME, File, Time
+from utils import TIMEZONE_OFFSET, File, Time, TimeFormat
 
 from palk._common import log
+from palk.AppointmentPage import URL_BASE
 
 
 class AvailabilityReport:
@@ -9,11 +10,14 @@ class AvailabilityReport:
 
     @property
     def header_lines(self):
-        time_str = TIME_FORMAT_TIME.stringify(Time())
+        time_str = TimeFormat(
+            '%B %d, %Y (%I:%M %p) %Z', TIMEZONE_OFFSET.LK
+        ).stringify(Time())
         return [
-            '# Passport Application Reservation - Availability Report',
-            f'(Compiled at {time_str})',
-            '',
+            '# Passport Application Reservation System - Availability Report',
+            f'*Compiled at {time_str}*',
+            'Data Source:'
+            + f' [Passport Application Reservation System]({URL_BASE})',
         ]
 
     @property
