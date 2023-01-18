@@ -18,7 +18,7 @@ jobs:
 
     - name: Install requirements
       run: |
-        pip instal -r requirements.txt .
+        pip install -r requirements.txt 
 
     - name: Run - Upload Data
       run: |
