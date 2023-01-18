@@ -18,7 +18,7 @@ jobs:
 
     - name: Install requirements
       run: |
-        pip install --upgrade --upgrade-strategy eager -r requirements.txt -e .
+        pip instal -r requirements.txt .
 
     - name: Run - Upload Data
       run: |
