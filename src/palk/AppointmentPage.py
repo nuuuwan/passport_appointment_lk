@@ -3,9 +3,8 @@ import time
 
 from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.common.by import By
-from utils import SECONDS_IN, Time, TimeDelta, TimeFormat, mr, List
+from utils import SECONDS_IN, List, Time, TimeDelta, TimeFormat, mr
 from utils.Browser import Browser
-
 
 from palk._common import log
 from palk.AppointmentTimeSlot import AppointmentTimeSlot
@@ -17,11 +16,12 @@ URL_BASE = os.path.join(
 WINDOW_WIDTH = 840
 WINDOW_HEIGHT = WINDOW_WIDTH * 3
 TIME_FORMAT = TimeFormat('%Y %B %d %I.%M %p')
-N_DAYS = 60
+N_DAYS = 1
 HOUR_STRS = ['8 AM', '9 AM', '10 AM', '11 AM', '12 PM', '2 PM']
 MAX_THREADS = 4
 APPOINTMENT_TYPES = ['Normal Service', 'One Day Service']
 LOCATIONS = ['HEAD OFFICE - BATTARAMULLA']
+
 
 class AppointmentPage:
     @staticmethod
@@ -102,13 +102,13 @@ class AppointmentPage:
             a.click()
             self.sleep()
         except NoSuchElementException:
-            raise Exception(f'No Data for Day: {self.month_str}/{self.day_str}')
-
-    def select_hour(self, hour_str : str):
-        try:
-            span = self.find_element(
-                By.XPATH, f'//span[text()="{hour_str}"]'
+            raise Exception(
+                f'No Data for Day: {self.month_str}/{self.day_str}'
             )
+
+    def select_hour(self, hour_str: str):
+        try:
+            span = self.find_element(By.XPATH, f'//span[text()="{hour_str}"]')
             span.click()
             self.sleep()
         except NoSuchElementException:
@@ -164,7 +164,7 @@ class AppointmentPage:
 
         self.driver.close()
         self.driver.quit()
-        
+
         return all_appointment_timeslots
 
     @staticmethod
@@ -186,32 +186,41 @@ class AppointmentPage:
                     pages.append(page)
 
         n_pages = len(pages)
-        log.info(f'Scraping {n_pages} pages.') 
+        log.info(f'Scraping {n_pages} pages.')
+
+        def inner(page=page):
+            try:
+                return page.get_timeslots()
+            except Exception as e:
+                log.warning(e)
+                return []
+            
+
         all_appointment_timeslots_list = mr.map_parallel(
-            lambda page: page.get_timeslots(),
+            lambda page: inner(page=page),
             pages,
             max_threads=MAX_THREADS,
         )
-        all_appointment_timeslots = List(all_appointment_timeslots_list).flatten()
+        all_appointment_timeslots = List(
+            all_appointment_timeslots_list
+        ).flatten()
         return all_appointment_timeslots
-    
+
 
 def test_appointment_page():
-    time_timeslot = Time() + TimeDelta(
-        90 * SECONDS_IN.DAY
-    )
+    time_timeslot = Time() + TimeDelta(90 * SECONDS_IN.DAY)
     page = AppointmentPage(
         appointment_type="Normal Service",
         location="HEAD OFFICE - BATTARAMULLA",
         time_timeslot=time_timeslot,
     )
     print(page.get_timeslots())
-    
+
 
 def test_static():
     print(AppointmentPage.get_all_timeslots())
 
+
 if __name__ == '__main__':
     test_appointment_page()
     # test_static()
-    

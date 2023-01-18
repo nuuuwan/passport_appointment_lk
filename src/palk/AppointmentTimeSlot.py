@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from utils import TIME_FORMAT_TIME, Time, TIME_FORMAT_DATE
+from utils import TIME_FORMAT_DATE, TIME_FORMAT_TIME, Time
 
 
 @dataclass
@@ -28,7 +28,6 @@ class AppointmentTimeSlot:
             ut=(float)(data['ut']),
             is_available=(str(data['is_available']) == 'True'),
         )
-        
 
     @property
     def time_str(self):
