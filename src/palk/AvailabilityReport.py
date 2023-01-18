@@ -11,7 +11,7 @@ class AvailabilityReport:
     @property
     def header_lines(self):
         time_str = TimeFormat(
-            '%B %d, %Y (%I:%M %p) %Z', TIMEZONE_OFFSET.LK
+            '%B %d, %Y (%I:%M %p)', TIMEZONE_OFFSET.LK
         ).stringify(Time())
         return [
             '# Passport Application Reservation System - Availability Report',
