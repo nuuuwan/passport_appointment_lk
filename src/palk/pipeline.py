@@ -14,7 +14,7 @@ def run(is_test_mode):
     git = Git(GIT_REPO_URL)
     git.clone(DIR_REPO, force=True)
     git.checkout(REPO_BRANCH_DATA)
-    
+
     all_timeslots = AppointmentPage.get_all_timeslots(is_test_mode)
     data_list = [x.to_dict for x in all_timeslots]    
 
@@ -37,4 +37,4 @@ def run(is_test_mode):
     summary_report.save()
 
 if __name__ == '__main__':
-    run(is_test_mode=True)
+    run(is_test_mode=False)
