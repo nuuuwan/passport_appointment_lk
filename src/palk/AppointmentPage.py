@@ -171,7 +171,7 @@ class AppointmentPage:
         return all_appointment_timeslots
 
     @staticmethod
-    def get_all_timeslots() -> list:
+    def get_all_timeslots(is_test_mode=False) -> list:
         time_now = Time()
         all_appointment_timeslots = []
         pages = []
@@ -187,6 +187,13 @@ class AppointmentPage:
                         time_timeslot=time_timeslot,
                     )
                     pages.append(page)
+
+        if is_test_mode:
+            import random
+            N_TEST_PAGES = 10
+            log.warning(f'{is_test_mode=}. Picking {N_TEST_PAGES} random pages.')
+            random.shuffle(pages)
+            pages = pages[:N_TEST_PAGES]
 
         n_pages = len(pages)
         log.info(f'Scraping {n_pages} pages.')

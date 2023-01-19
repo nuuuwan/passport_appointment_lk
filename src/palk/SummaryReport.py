@@ -64,7 +64,11 @@ class SummaryData:
             if timeslot.appointment_type == 'One Day Service'
             and timeslot.location == 'HEAD OFFICE - BATTARAMULLA'
         ]
-        ut = TimeFormat('%Y%m%d%H%M%S%Z').parse(file.name[5:-4]).ut
+
+        # palk.*.tsv
+        time_part = file.name[5:-4]
+        ut = TimeFormat('%Y%m%d.%H%M%S').parse(time_part).ut
+        
         ut_now = Time().ut
 
         ho_ods_wait_s = None
