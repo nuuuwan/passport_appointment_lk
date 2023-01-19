@@ -26,8 +26,7 @@ if __name__ == '__main__':
 
         time_now = Time()
         time_id = TIME_FORMAT_TIME_ID.stringify(time_now)
-        history_file_name = f'/tmp/palk.{time_id}.tsv'
-        latest_file_name = os.path.join(DIR_REPO, f'palk.{time_id}.tsv')
+        history_file_name = os.path.join(DIR_REPO, f'palk.{time_id}.tsv')
         TSVFile(history_file_name).write(data_list)
         log.info(f'Wrote data to "{history_file_name}".')
 
