@@ -1,4 +1,5 @@
 import os
+import time
 
 from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.common.by import By
@@ -25,6 +26,10 @@ APPOINTMENT_TYPES = ['Normal Service', 'One Day Service']
 LOCATIONS = [
     'HEAD OFFICE - BATTARAMULLA',
 ]
+
+
+def custom_sleep():
+    time.sleep(4)
 
 
 class AppointmentPage:
@@ -61,14 +66,14 @@ class AppointmentPage:
         self.browser.find_element(
             By.XPATH, f'//label[text()="{self.appointment_type}"]'
         ).click()
-        self.browser.sleep()
+        custom_sleep()
 
     def select_location(self):
         tds = self.browser.find_elements(By.TAG_NAME, 'td')
         for i, td in enumerate(tds):
             if td.text == self.location:
                 tds[i - 1].click()
-                self.browser.sleep()
+                custom_sleep()
                 return
         raise Exception(f'Location {self.location} not found')
 
@@ -89,7 +94,7 @@ class AppointmentPage:
                 raise Exception('No Data for Month: ' + self.month_str)
 
             elem_next.click()
-            self.browser.sleep()
+            custom_sleep()
 
     def select_day(self):
         try:
@@ -97,7 +102,7 @@ class AppointmentPage:
                 By.XPATH, f'//a[text()="{self.day_str}"]'
             )
             a.click()
-            self.browser.sleep()
+            custom_sleep()
         except NoSuchElementException:
             raise Exception(
                 f'No Data for Day: {self.month_str}/{self.day_str}'
@@ -109,7 +114,7 @@ class AppointmentPage:
                 By.XPATH, f'//span[text()="{hour_str}"]'
             )
             span.click()
-            self.browser.sleep()
+            custom_sleep()
         except NoSuchElementException:
             raise Exception('No Data for Hour: ' + hour_str)
 
