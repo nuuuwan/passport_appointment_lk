@@ -1,6 +1,8 @@
+import os
+
 from utils import TIMEZONE_OFFSET, File, Time, TimeFormat
 
-from palk._common import log
+from palk._common import DIR_REPO, log
 from palk.AppointmentPage import URL_BASE
 
 
@@ -61,9 +63,9 @@ class AvailabilityReport:
     def save(self):
         lines = self.header_lines + self.timeslot_lines + self.footer_lines
         content = '\n\n'.join(lines)
-        md_file_name = '/tmp/README.md'
-        File(md_file_name).write(content)
-        log.info(f'Wrote report to "{md_file_name}".')
+        md_file_path = os.path.join(DIR_REPO, 'README.md')
+        File(md_file_path).write(content)
+        log.info(f'Wrote AvailabilityReport to "{md_file_path}".')
 
 
 if __name__ == '__main__':

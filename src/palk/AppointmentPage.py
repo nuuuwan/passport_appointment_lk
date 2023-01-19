@@ -1,5 +1,4 @@
 import os
-import time
 
 from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.common.by import By
@@ -15,6 +14,9 @@ URL_BASE = os.path.join(
 )
 WINDOW_WIDTH = 840
 WINDOW_HEIGHT = WINDOW_WIDTH * 3
+
+WINDOW_DIM = (WINDOW_WIDTH, WINDOW_HEIGHT)
+
 TIME_FORMAT = TimeFormat('%Y %B %d %I.%M %p')
 N_DAYS = 90
 HOUR_STRS = ['8 AM', '9 AM', '10 AM', '11 AM', '12 PM', '2 PM']
@@ -27,15 +29,10 @@ LOCATIONS = [
 
 class AppointmentPage:
     @staticmethod
-    def sleep():
-        T_SLEEP = 2
-        time.sleep(T_SLEEP)
-
-    @staticmethod
-    def get_driver():
+    def get_browser():
         browser = Browser()
-        browser.browser.set_window_size(WINDOW_WIDTH, WINDOW_HEIGHT)
-        return browser.browser
+        browser.set_window_dim(WINDOW_DIM)
+        return browser
 
     def __init__(
         self,
@@ -46,7 +43,7 @@ class AppointmentPage:
         self.appointment_type = appointment_type
         self.location = location
         self.time_timeslot = time_timeslot
-        self.driver = None
+        self.browser = None
 
     @property
     def year_str(self):
@@ -60,49 +57,47 @@ class AppointmentPage:
     def day_str(self):
         return TimeFormat('%d').stringify(self.time_timeslot)
 
-    def find_element(self, by, value):
-        return self.driver.find_element(by, value)
-
-    def find_elements(self, by, value):
-        return self.driver.find_elements(by, value)
-
     def select_appointment_type(self):
-        self.find_element(
+        self.browser.find_element(
             By.XPATH, f'//label[text()="{self.appointment_type}"]'
         ).click()
-        AppointmentPage.sleep()
+        self.browser.sleep()
 
     def select_location(self):
-        tds = self.find_elements(By.TAG_NAME, 'td')
+        tds = self.browser.find_elements(By.TAG_NAME, 'td')
         for i, td in enumerate(tds):
             if td.text == self.location:
                 tds[i - 1].click()
-                AppointmentPage.sleep()
+                self.browser.sleep()
                 return
         raise Exception(f'Location {self.location} not found')
 
     def goto_month_page(self):
         MAX_MONTHS = 4
         for i_month in range(MAX_MONTHS):
-            elem_month = self.find_element(
+            elem_month = self.browser.find_element(
                 By.CLASS_NAME, 'ui-datepicker-month'
             )
             month_str = elem_month.text
             if month_str == self.month_str:
                 break
 
-            elem_next = self.find_element(By.CLASS_NAME, 'ui-datepicker-next')
+            elem_next = self.browser.find_element(
+                By.CLASS_NAME, 'ui-datepicker-next'
+            )
             if 'ui-state-disabled' in elem_next.get_attribute('class'):
                 raise Exception('No Data for Month: ' + self.month_str)
 
             elem_next.click()
-            AppointmentPage.sleep()
+            self.browser.sleep()
 
     def select_day(self):
         try:
-            a = self.find_element(By.XPATH, f'//a[text()="{self.day_str}"]')
+            a = self.browser.find_element(
+                By.XPATH, f'//a[text()="{self.day_str}"]'
+            )
             a.click()
-            self.sleep()
+            self.browser.sleep()
         except NoSuchElementException:
             raise Exception(
                 f'No Data for Day: {self.month_str}/{self.day_str}'
@@ -110,9 +105,11 @@ class AppointmentPage:
 
     def select_hour(self, hour_str: str):
         try:
-            span = self.find_element(By.XPATH, f'//span[text()="{hour_str}"]')
+            span = self.browser.find_element(
+                By.XPATH, f'//span[text()="{hour_str}"]'
+            )
             span.click()
-            self.sleep()
+            self.browser.sleep()
         except NoSuchElementException:
             raise Exception('No Data for Hour: ' + hour_str)
 
@@ -124,7 +121,7 @@ class AppointmentPage:
         n_is_available = 0
         for i_button_qtr_hour in range(N_BUTTONS_QTR_HOUR):
             id = f'reservation:j_idt226:{i_button_qtr_hour}' + ':j_idt227'
-            button_qtr_hour = self.find_element(By.ID, id)
+            button_qtr_hour = self.browser.find_element(By.ID, id)
             is_available = 'old' not in button_qtr_hour.get_attribute('class')
             if is_available:
                 n_is_available += 1
@@ -148,8 +145,8 @@ class AppointmentPage:
         return appointment_timeslots
 
     def get_timeslots(self):
-        self.driver = AppointmentPage.get_driver()
-        self.driver.get(URL_BASE)
+        self.browser = AppointmentPage.get_browser()
+        self.browser.open(URL_BASE)
 
         self.select_appointment_type()
         self.select_location()
@@ -164,8 +161,7 @@ class AppointmentPage:
         except Exception as e:
             log.warning(e)
 
-        self.driver.close()
-        self.driver.quit()
+        self.browser.quit()
 
         return all_appointment_timeslots
 
@@ -199,7 +195,7 @@ class AppointmentPage:
 
         all_appointment_timeslots_list = mr.map_parallel(
             lambda page: inner(page=page),
-            pages,
+            pages[:10],
             max_threads=MAX_THREADS,
         )
         all_appointment_timeslots = List(
