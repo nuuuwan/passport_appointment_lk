@@ -195,7 +195,7 @@ class AppointmentPage:
 
         all_appointment_timeslots_list = mr.map_parallel(
             lambda page: inner(page=page),
-            pages[:10],
+            pages,
             max_threads=MAX_THREADS,
         )
         all_appointment_timeslots = List(
