@@ -1,6 +1,6 @@
 # Passport Application Reservation System - Availability Report
 
-*As of January 22, 2023 (05:00 PM)*
+*As of January 22, 2023 (05:57 PM)*
 
 ## Normal Service
 
@@ -10,7 +10,7 @@
 
 * 2023-04-19 (5 timeslots)
 
-* 2023-04-20 (18 timeslots)
+* 2023-04-20 (17 timeslots)
 
 * 2023-04-21 (20 timeslots)
 
