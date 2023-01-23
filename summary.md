@@ -2,7 +2,7 @@
 
 Of the data from the Passport Application Reservation System of the Sri Lanka Department of Immigration and Emigration.
 
-*As of 2023-01-23 15:57:52*
+*As of 2023-01-23 16:58:07*
 
 ![Wait Time Chart](summary.wait_time_chart.png)
 
