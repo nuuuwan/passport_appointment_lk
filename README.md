@@ -1,6 +1,6 @@
 # Passport Application Reservation System - Availability Report
 
-*As of January 24, 2023 (09:56 PM)*
+*As of January 24, 2023 (10:56 PM)*
 
 ## One Day Service
 
@@ -32,6 +32,6 @@
 
 ### HEAD OFFICE - BATTARAMULLA
 
-* 2023-04-21 (11 timeslots)
+* 2023-04-21 (10 timeslots)
 
 Data Source: [Passport Application Reservation System](https://eservices.immigration.gov.lk:8443/appointment/pages/reservationApplication.xhtml)
