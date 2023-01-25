@@ -1,6 +1,6 @@
 # Passport Application Reservation System - Availability Report
 
-*As of January 25, 2023 (06:00 AM)*
+*As of January 25, 2023 (07:24 AM)*
 
 ## One Day Service
 
