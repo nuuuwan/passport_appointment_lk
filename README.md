@@ -1,6 +1,6 @@
 # Passport Application Reservation System - Availability Report
 
-*As of January 27, 2023 (03:58 PM)*
+*As of January 27, 2023 (04:57 PM)*
 
 ## One Day Service
 
@@ -37,6 +37,8 @@
 ## Normal Service
 
 ### HEAD OFFICE - BATTARAMULLA
+
+* 2023-03-28 (1 timeslot)
 
 * 2023-04-25 (13 timeslots)
 
