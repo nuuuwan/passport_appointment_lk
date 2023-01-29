@@ -1,4 +1,4 @@
-name: Upload Data - Cron (Daily - Every 6 Hours UTC)
+name: Upload Data - Cron (Daily - Every 6 Hour UTC)
 
 
 on:
