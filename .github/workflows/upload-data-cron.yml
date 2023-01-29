@@ -1,9 +1,9 @@
-name: Upload Data - Cron (Daily - Every 3 Hours UTC)
+name: Upload Data - Cron (Daily - Every 6 Hours UTC)
 
 
 on:
   schedule:
-    - cron: '0 */3 * * *'
+    - cron: '0 */6 * * *'
 
 jobs:
   upload-data:
