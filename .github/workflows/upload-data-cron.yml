@@ -1,6 +1,5 @@
 name: Upload Data - Cron (Daily - Every 6 Hour UTC)
 
-
 on:
   schedule:
     - cron: '0 */6 * * *'
