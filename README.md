@@ -1,5 +1,5 @@
 # Passport Application Reservation System - Availability Report
 
-*As of April 06, 2023 (11:54 PM)*
+*As of April 07, 2023 (06:08 AM)*
 
 Data Source: [Passport Application Reservation System](https://eservices.immigration.gov.lk:8443/appointment/pages/reservationApplication.xhtml)
