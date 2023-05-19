@@ -1,8 +1,10 @@
 name: Upload Data - Cron (Daily - Every 6 Hour UTC)
 
-on:
-  schedule:
-    - cron: '0 */6 * * *'
+# on:
+#   schedule:
+#     - cron: '0 */6 * * *'
+
+on: workflow_dispatch
 
 jobs:
   upload-data:
